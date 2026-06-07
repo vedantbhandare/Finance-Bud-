@@ -1,0 +1,24 @@
+{
+  "name": "finance-buddy",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:web": "cd apps/mobile && npx expo start --web",
+    "dev:android": "cd apps/mobile && npx expo start --android",
+    "dev:backend": "cd backend && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
+    "build:web": "cd apps/mobile && npx expo export --platform web",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "docker:up": "docker compose up -d db redis",
+    "docker:down": "docker compose down",
+    "docker:migrate": "docker compose run --rm migrate"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0"
+  },
+  "packageManager": "npm@10.0.0"
+}

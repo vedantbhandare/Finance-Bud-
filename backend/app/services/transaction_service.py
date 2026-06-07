@@ -84,22 +84,24 @@ class TransactionService:
             return None
 
         update_data = data.model_dump(exclude_unset=True)
+        mapped: dict = {}
         for key, value in update_data.items():
             if key == "type":
                 # Map schema "type" to ORM "transaction_type" and convert to enum
-                txn_type = TransactionType.INCOME if value == "income" else TransactionType.EXPENSE
-                setattr(txn, "transaction_type", txn_type)
+                mapped["transaction_type"] = (
+                    TransactionType.INCOME if value == "income" else TransactionType.EXPENSE
+                )
             else:
-                setattr(txn, key, value)
+                mapped[key] = value
 
-        return await self.repo.update(txn)
+        return await self.repo.update_by_id(txn_id, mapped)
 
     async def delete_transaction(self, user_id: UUID, txn_id: UUID) -> bool:
         """Delete a transaction."""
         txn = await self.get_transaction(user_id, txn_id)
         if not txn:
             return False
-        await self.repo.delete(txn_id)
+        await self.repo.delete_by_id(txn_id)
         return True
 
     async def get_monthly_summary(self, user_id: UUID, year: int, month: int) -> dict:

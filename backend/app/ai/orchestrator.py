@@ -3,25 +3,28 @@
 Uses Google Gemini API (free tier).
 NEVER computes financial truth — only interprets pre-computed context.
 """
+
+from __future__ import annotations
+
 import asyncio
 import time
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.ai.context_assembler import FinancialContext, assemble_context
-from app.ai.prompt_builder import build_chat_prompt
+from app.ai.context import assemble_context
 from app.ai.fallbacks import generate_fallback_response
+from app.ai.prompts import build_chat_prompt
 from app.config import get_settings
 from app.models.conversation import Conversation, Message
-from app.repositories.conversation_repo import ConversationRepository, MessageRepository
+from app.repositories.conversation import ConversationRepository, MessageRepository
 from app.schemas.chat import ChatMetadata, ChatResponse
 
 
 class AIOrchestrator:
     """Main AI coordination — assembles context, calls Gemini, parses response."""
 
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: AsyncSession) -> None:
         self.db = db
         self.settings = get_settings()
         self.conv_repo = ConversationRepository(db)
@@ -37,12 +40,13 @@ class AIOrchestrator:
         start_time = time.time()
 
         # Get or create conversation
+        conversation: Conversation | None = None
         if conversation_id:
             conversation = await self.conv_repo.get_by_id(conversation_id)
-            if not conversation or conversation.user_id != user_id:
+            if conversation and conversation.user_id != user_id:
                 conversation = None
 
-        if not conversation_id or not conversation:
+        if conversation is None:
             conversation = Conversation(user_id=user_id, title=message[:100])
             self.db.add(conversation)
             await self.db.flush()
@@ -94,7 +98,6 @@ class AIOrchestrator:
         model_name = "gemini-2.0-flash"
 
         if not self.settings.gemini_api_key:
-            # No API key — use fallback
             return generate_fallback_response(), 0, "fallback"
 
         try:
@@ -114,10 +117,12 @@ class AIOrchestrator:
 
             tokens_used = 0
             if hasattr(response, "usage_metadata"):
-                tokens_used = getattr(response.usage_metadata, "total_token_count", 0)
+                tokens_used = getattr(
+                    response.usage_metadata, "total_token_count", 0
+                )
 
             return response.text, tokens_used, model_name
 
-        except Exception as e:
+        except Exception:
             # Graceful degradation — never leave the user hanging
             return generate_fallback_response(), 0, "fallback"

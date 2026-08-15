@@ -1,6 +1,6 @@
 """Async SQLAlchemy engine, session factory, and FastAPI dependency.
 
-Uses SQLite for local development (zero setup), PostgreSQL for production.
+Supports SQLite (local dev, zero setup) and PostgreSQL (production).
 """
 
 from __future__ import annotations
@@ -17,7 +17,6 @@ from app.config import get_settings
 
 _settings = get_settings()
 
-# SQLite needs special handling — no pool_size, connect_args for threads
 _is_sqlite = _settings.database_url.startswith("sqlite")
 
 _engine_kwargs: dict = {
@@ -41,7 +40,7 @@ async_session_factory = async_sessionmaker(
 
 
 async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
-    """FastAPI dependency that yields an async database session."""
+    """FastAPI dependency — yields an async session with auto commit/rollback."""
     async with async_session_factory() as session:
         try:
             yield session
@@ -52,9 +51,10 @@ async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
 
 
 async def create_tables() -> None:
-    """Create all tables (used for SQLite dev mode instead of Alembic)."""
+    """Create all tables (SQLite dev mode — Alembic handles production)."""
     from app.models.base import Base
-    # Import all models so they register with Base.metadata
+
+    # Import all model modules so they register with Base.metadata
     import app.models.user  # noqa: F401
     import app.models.transaction  # noqa: F401
     import app.models.goal  # noqa: F401

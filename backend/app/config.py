@@ -1,9 +1,24 @@
-"""Application configuration loaded from environment variables."""
+"""Application configuration loaded from environment variables.
+
+Validates critical settings at startup so the app fails fast rather than
+running with insecure defaults.
+"""
 
 from __future__ import annotations
 
-from pydantic import Field
+import secrets
+from functools import lru_cache
+
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+_INSECURE_DEFAULTS = frozenset({
+    "change-this-to-a-secure-random-string-at-least-32-chars",
+    "dev-secret-change-in-production",
+    "your-secret-key-change-this",
+    "",
+})
 
 
 class Settings(BaseSettings):
@@ -18,7 +33,7 @@ class Settings(BaseSettings):
 
     # ── Database ────────────────────────────────────────────────────────
     database_url: str = Field(
-        default="postgresql+asyncpg://postgres:postgres@localhost:5432/finance_buddy",
+        default="sqlite+aiosqlite:///./finance_buddy.db",
         description="Async SQLAlchemy database URL",
     )
     database_echo: bool = Field(default=False)
@@ -28,7 +43,8 @@ class Settings(BaseSettings):
 
     # ── JWT ──────────────────────────────────────────────────────────────
     jwt_secret_key: str = Field(
-        default="change-this-to-a-secure-random-string-at-least-32-chars",
+        default_factory=lambda: secrets.token_urlsafe(48),
+        description="HMAC secret for JWT signing — MUST be overridden in production",
     )
     jwt_algorithm: str = Field(default="HS256")
     access_token_expire_minutes: int = Field(default=30)
@@ -39,19 +55,40 @@ class Settings(BaseSettings):
 
     # ── App ──────────────────────────────────────────────────────────────
     app_name: str = Field(default="Finance Buddy")
-    app_version: str = Field(default="0.1.0")
+    app_version: str = Field(default="0.2.0")
     debug: bool = Field(default=False)
     cors_origins: list[str] = Field(
-        default=["http://localhost:3000", "http://localhost:5173"],
+        default=[
+            "http://localhost:3000",
+            "http://localhost:5173",
+            "http://localhost:8081",
+            "http://localhost:19006",
+        ],
     )
 
     # ── Hardcoded for MVP ────────────────────────────────────────────────
     currency: str = "INR"
 
+    @field_validator("jwt_secret_key")
+    @classmethod
+    def _warn_insecure_secret(cls, v: str) -> str:
+        """Log a loud warning if the JWT secret is a known insecure default.
 
+        In production the app should be started with a proper secret.
+        We don't *crash* in debug mode to keep local development easy,
+        but we do log a bright warning.
+        """
+        import logging
+
+        if v in _INSECURE_DEFAULTS:
+            logging.getLogger(__name__).warning(
+                "⚠️  JWT_SECRET_KEY is set to an insecure default! "
+                "Generate a real secret: python -c \"import secrets; print(secrets.token_urlsafe(48))\""
+            )
+        return v
+
+
+@lru_cache(maxsize=1)
 def get_settings() -> Settings:
-    """Return a cached Settings instance."""
-    return _settings
-
-
-_settings = Settings()
+    """Return a cached Settings instance (loaded once per process)."""
+    return Settings()

@@ -4,7 +4,7 @@ from collections.abc import Sequence
 from datetime import date
 from typing import Any, Generic, TypeVar
 
-from sqlalchemy import Select, func, or_, select, update
+from sqlalchemy import Select, case, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload, selectinload
 
@@ -158,6 +158,86 @@ class TransactionRepository(Repository[Transaction]):
     ) -> int:
         subquery = self._filtered(user_id, start_date, end_date, transaction_type, category_id).subquery()
         return await self.session.scalar(select(func.count()).select_from(subquery)) or 0
+
+    # ---- SQL aggregation methods (no Python-side loops) ----
+
+    async def aggregate_monthly(
+        self, user_id: str, start: date, end: date,
+    ) -> dict[str, "Decimal"]:
+        """Single SQL query for income, expenses, and net."""
+        from decimal import Decimal as D
+
+        stmt = select(
+            func.coalesce(
+                func.sum(case((Transaction.transaction_type == "income", Transaction.amount), else_=0)), 0
+            ).label("total_income"),
+            func.coalesce(
+                func.sum(case((Transaction.transaction_type == "expense", Transaction.amount), else_=0)), 0
+            ).label("total_expenses"),
+        ).where(
+            Transaction.user_id == user_id,
+            Transaction.transaction_date >= start,
+            Transaction.transaction_date <= end,
+        )
+        row = (await self.session.execute(stmt)).one()
+        income = D(str(row.total_income))
+        expenses = D(str(row.total_expenses))
+        return {"total_income": income, "total_expenses": expenses, "net": income - expenses}
+
+    async def spending_by_category(
+        self, user_id: str, start: date, end: date,
+    ) -> list[dict]:
+        """SQL GROUP BY for expense breakdown per category."""
+        stmt = (
+            select(
+                Transaction.category_id,
+                Category.name.label("category_name"),
+                func.sum(Transaction.amount).label("total"),
+            )
+            .join(Category, Transaction.category_id == Category.id, isouter=True)
+            .where(
+                Transaction.user_id == user_id,
+                Transaction.transaction_type == "expense",
+                Transaction.transaction_date >= start,
+                Transaction.transaction_date <= end,
+            )
+            .group_by(Transaction.category_id, Category.name)
+            .order_by(func.sum(Transaction.amount).desc())
+        )
+        from decimal import Decimal as D
+
+        rows = (await self.session.execute(stmt)).all()
+        return [
+            {
+                "category_id": row.category_id,
+                "category_name": row.category_name or "Uncategorized",
+                "total": D(str(row.total)),
+            }
+            for row in rows
+        ]
+
+    async def daily_spending(
+        self, user_id: str, start: date, end: date,
+    ) -> list[dict]:
+        """SQL GROUP BY for daily expense totals."""
+        from decimal import Decimal as D
+
+        stmt = (
+            select(
+                Transaction.transaction_date,
+                func.sum(Transaction.amount).label("amount"),
+            )
+            .where(
+                Transaction.user_id == user_id,
+                Transaction.transaction_type == "expense",
+                Transaction.transaction_date >= start,
+                Transaction.transaction_date <= end,
+            )
+            .group_by(Transaction.transaction_date)
+            .order_by(Transaction.transaction_date)
+        )
+        rows = (await self.session.execute(stmt)).all()
+        return [{"date": row.transaction_date, "amount": D(str(row.amount))} for row in rows]
 
 
 class RecurringRuleRepository(Repository[RecurringRule]):

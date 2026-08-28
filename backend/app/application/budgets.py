@@ -7,8 +7,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.schemas import BudgetEnvelope, BudgetGenerateResponse
 from app.application.serializers import budget_response
+from app.core.errors import AppError
 from app.core.time import current_month_range
-from app.domain.budgets import BudgetInput, generate_budget
+from app.domain.budgets import BudgetInput, generate_budget, monthly_goal_contribution
 from app.infrastructure.orm.models import BudgetAllocation, BudgetPlan, User
 from app.infrastructure.orm.repositories import (
     BudgetRepository,
@@ -35,17 +36,26 @@ class BudgetService:
         return BudgetEnvelope(budget=budget_response(plan))
 
     async def generate(self, user: User) -> BudgetGenerateResponse:
-        await self.categories.ensure_system_categories()
+        # System categories are seeded at app startup — no per-request seeding.
         await self.budgets.expire_active(user.id)
 
         start, end = current_month_range()
         recurring_rules = await self.recurring.active_for_user(user.id)
-        fixed = tuple((rule.category.name if rule.category else rule.description, rule.amount) for rule in recurring_rules)
+        fixed = tuple(
+            (rule.category.name if rule.category else rule.description, rule.amount)
+            for rule in recurring_rules
+        )
 
+        # Date-aware goal allocation: goals due in 2 months get 6x the
+        # monthly allocation of goals due in 12 months.
         active_goals = await self.goals.active_for_user(user.id)
-        monthly_goal_need = sum((goal.target_amount - goal.current_amount for goal in active_goals), Decimal("0.00"))
-        if monthly_goal_need > 0:
-            monthly_goal_need = monthly_goal_need / Decimal("12")
+        monthly_goal_need = sum(
+            (
+                monthly_goal_contribution(g.target_amount, g.current_amount, g.target_date)
+                for g in active_goals
+            ),
+            Decimal("0.00"),
+        )
 
         preference = await self.preferences.for_user(user.id)
         overspending_categories: tuple[str, ...] = ()
@@ -91,9 +101,9 @@ class BudgetService:
         await self.session.flush()
 
         reloaded = await self.budgets.current(user.id)
-        assert reloaded is not None
+        if not reloaded:
+            raise AppError("Failed to reload generated budget plan")
         return BudgetGenerateResponse(
             budget_plan=budget_response(reloaded),
             message="Budget generated successfully",
         )
-

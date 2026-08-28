@@ -29,6 +29,11 @@ async def engine():
     engine = create_async_engine("sqlite+aiosqlite:///:memory:", echo=False)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    # Seed system categories (mirrors app lifespan)
+    from app.infrastructure.orm.repositories import CategoryRepository
+    async with async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)() as session:
+        await CategoryRepository(session).ensure_system_categories()
+        await session.commit()
     yield engine
     await engine.dispose()
 

@@ -1,9 +1,31 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date
 from decimal import Decimal
 
 from app.domain.money import money
+
+
+def monthly_goal_contribution(
+    target: Decimal,
+    current: Decimal,
+    target_date: date | None,
+    today: date | None = None,
+) -> Decimal:
+    """Compute the monthly contribution needed to hit a goal by its target date.
+
+    If no target_date is set, defaults to spreading over 12 months.
+    Never returns a negative or zero-division result.
+    """
+    remaining = max(Decimal("0"), target - current)
+    if remaining <= 0:
+        return Decimal("0.00")
+    if not target_date:
+        return money(remaining / Decimal("12"))
+    ref = today or date.today()
+    months_left = max(1, (target_date.year - ref.year) * 12 + (target_date.month - ref.month))
+    return money(remaining / Decimal(str(months_left)))
 
 
 @dataclass(frozen=True)

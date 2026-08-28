@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from collections import defaultdict
 from datetime import date
 from decimal import Decimal
 
@@ -30,7 +29,7 @@ class TransactionService:
         self.categories = CategoryRepository(session)
 
     async def _resolve_category(self, user_id: str, category_id: str | None, category_name: str | None, description: str | None, merchant: str | None):
-        await self.categories.ensure_system_categories()
+        # System categories are seeded at app startup (lifespan) — no per-request seeding.
         if category_id:
             category = await self.categories.get_available(category_id, user_id)
             if not category:
@@ -140,43 +139,35 @@ class TransactionService:
         await self.transactions.delete(transaction)
 
     async def monthly_summary(self, user_id: str, year: int, month: int) -> MonthlySummary:
+        """Compute monthly financial summary using SQL aggregation.
+
+        All heavy lifting (income/expense totals, category breakdown,
+        daily trend) is pushed to the database — no Python-side loops
+        over raw transaction rows.
+        """
         start, end = month_range(year, month)
-        transactions = await self.transactions.list_for_user(user_id, 0, 10000, start, end)
 
-        income = Decimal("0.00")
-        expenses = Decimal("0.00")
-        by_category: dict[str | None, dict] = {}
-        daily = defaultdict(lambda: Decimal("0.00"))
+        # Single SQL query for totals
+        totals = await self.transactions.aggregate_monthly(user_id, start, end)
+        income = totals["total_income"]
+        expenses = totals["total_expenses"]
 
-        for transaction in transactions:
-            if transaction.transaction_type == "income":
-                income += transaction.amount
-                continue
-
-            expenses += transaction.amount
-            daily[transaction.transaction_date] += transaction.amount
-            key = transaction.category_id
-            name = transaction.category.name if transaction.category else "Uncategorized"
-            if key not in by_category:
-                by_category[key] = {
-                    "category_id": key,
-                    "category_name": name,
-                    "total": Decimal("0.00"),
-                    "color": color_for_category(name),
-                }
-            by_category[key]["total"] += transaction.amount
-
+        # SQL GROUP BY for category breakdown
+        category_rows_raw = await self.transactions.spending_by_category(user_id, start, end)
         category_rows = [
             CategorySummary(
-                category_id=value["category_id"],
-                category_name=value["category_name"],
-                total=value["total"],
-                percentage=round(float(value["total"] / expenses * 100), 2) if expenses > 0 else 0,
-                color=value["color"],
+                category_id=row["category_id"],
+                category_name=row["category_name"],
+                total=row["total"],
+                percentage=round(float(row["total"] / expenses * 100), 2) if expenses > 0 else 0,
+                color=color_for_category(row["category_name"]),
             )
-            for value in sorted(by_category.values(), key=lambda row: row["total"], reverse=True)
+            for row in category_rows_raw
         ]
-        daily_rows = [DailySpend(date=day, amount=amount) for day, amount in sorted(daily.items())]
+
+        # SQL GROUP BY for daily trend
+        daily_rows_raw = await self.transactions.daily_spending(user_id, start, end)
+        daily_rows = [DailySpend(date=row["date"], amount=row["amount"]) for row in daily_rows_raw]
 
         return MonthlySummary(
             total_income=income,

@@ -31,7 +31,6 @@ class AuthService:
             password_hash=hash_password(data.password),
         )
         await self.users.add(user)
-        await self.categories.ensure_system_categories()
         return self._tokens(user)
 
     async def login(self, data: LoginRequest) -> TokenResponse:

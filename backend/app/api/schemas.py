@@ -276,9 +276,11 @@ class FinancialContextResponse(BaseModel):
     savings_rate: float
     health_score: int
     days_until_payday: int
+    spending_trend: str = "stable"
     top_spending_categories: list[CategorySummary]
     recent_transactions: list[TransactionResponse]
     active_goals: list[GoalResponse]
+    budget_allocations: list[BudgetAllocationResponse] = Field(default_factory=list)
 
 
 class ChatRequest(BaseModel):

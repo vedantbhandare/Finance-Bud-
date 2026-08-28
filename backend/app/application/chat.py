@@ -13,8 +13,10 @@ from app.api.schemas import (
     FinancialContextResponse,
     MessageResponse,
 )
+from app.application.budgets import BudgetService
 from app.application.goals import GoalService
 from app.application.health import HealthService
+from app.application.serializers import budget_allocation_response
 from app.application.transactions import TransactionService
 from app.core.errors import NotFoundError
 from app.core.time import pay_cycle_range
@@ -36,6 +38,7 @@ class ChatService:
         txns = TransactionService(self.session)
         goals = GoalService(self.session)
         health = HealthService(self.session)
+        budgets = BudgetService(self.session)
 
         summary = await txns.monthly_summary(user.id, today.year, today.month)
         recent = await txns.list(user.id, 1, 5)
@@ -44,6 +47,13 @@ class ChatService:
         _, cycle_end = pay_cycle_range(user.pay_cycle_day, today)
         income = user.monthly_salary or Decimal("0.00")
 
+        # Include budget pacing data so the AI can answer
+        # "Can I afford Swiggy tonight?" accurately.
+        budget_envelope = await budgets.current(user.id)
+        allocation_responses = []
+        if budget_envelope.budget:
+            allocation_responses = budget_envelope.budget.allocations
+
         return FinancialContextResponse(
             monthly_income=income,
             total_spent_this_month=summary.total_expenses,
@@ -51,9 +61,11 @@ class ChatService:
             savings_rate=score.savings_rate,
             health_score=score.overall_score,
             days_until_payday=max((cycle_end - today).days, 0),
+            spending_trend=score.spending_trend,
             top_spending_categories=summary.by_category[:5],
             recent_transactions=recent.items,
             active_goals=active_goals,
+            budget_allocations=allocation_responses,
         )
 
     async def send(self, user: User, message_text: str, conversation_id: str | None = None) -> ChatResponse:
@@ -104,4 +116,3 @@ class ChatService:
             MessageResponse.model_validate(msg, from_attributes=True)
             for msg in await self.messages.list_for_conversation(conversation_id, limit)
         ]
-

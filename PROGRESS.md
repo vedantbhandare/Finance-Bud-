@@ -220,6 +220,21 @@ Mobile design rules:
 
 ### Module 1: Backend Core/Domain Foundation
 
-- Status: in progress.
-- Goal: replace fragile backend internals with a clean foundation while preserving API feature parity.
-- Resume here: create the new backend folders and files above, then update routers/tests to the new contracts.
+- Status: COMPLETE.
+- Replaced fragile backend internals with clean DDD layering: core/, domain/, application/, infrastructure/, api/.
+- All 13 tests passing.
+
+### Module 2: Logic Rewrite (10 Critical Fixes)
+
+- Status: COMPLETE.
+- Changes made:
+  1. **SQL aggregation** — `monthly_summary` now uses 3 SQL queries (SUM/CASE, GROUP BY category, GROUP BY date) instead of Python loops over 10K rows.
+  2. **Real spending trend** — `spending_trend()` compares current vs. previous month expenses (15% threshold). No longer hardcoded to "stable".
+  3. **Richer recommendations** — Expanded from 3 to 10+ possible recommendations with tiered savings advice, spending trend awareness, overspent category callouts, and end-of-month urgency alerts.
+  4. **Date-aware goal allocation** — `monthly_goal_contribution()` computes per-goal monthly need based on actual target dates. A goal due in 2 months gets 6x the allocation of one due in 12 months.
+  5. **Word-boundary categorization** — `categorize_text()` now uses precompiled regex with `\b` word boundaries. "auto" no longer false-matches "automatic payment".
+  6. **AI chat gets budget context** — `FinancialContextResponse` now includes `budget_allocations` (spent vs. allocated per category) and `spending_trend`. Prompt template shows pacing data.
+  7. **Goal contribution cap** — Contributions are capped at the remaining amount needed. No more ₹1L contributions to a ₹50K goal.
+  8. **Removed ensure_system_categories spam** — Calls removed from auth/register, transaction/create, budget/generate, onboarding/expenses. Only runs once at app startup.
+  9. **Fixed assert in budget generation** — Replaced `assert reloaded is not None` with proper `AppError` that works under `python -O`.
+  10. **Enhanced AI prompt** — Budget pacing section added to system prompt showing spent/allocated per category.

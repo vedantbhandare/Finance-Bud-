@@ -23,7 +23,6 @@ class OnboardingService:
         return StatusResponse(message="Income details saved")
 
     async def expenses(self, user: User, data: ExpenseSetup) -> StatusResponse:
-        await self.categories.ensure_system_categories()
         for expense in data.expenses:
             category = None
             if expense.category_name:

@@ -57,14 +57,19 @@ class GoalService:
         goal = await self.get_entity(user_id, goal_id)
         if goal.status != "active":
             raise ValidationError("Cannot contribute to an inactive goal")
+        remaining = goal.target_amount - goal.current_amount
+        if remaining <= 0:
+            raise ValidationError("Goal is already fully funded")
+        # Cap contribution at the remaining amount to prevent overshoot
+        amount = min(data.amount, remaining)
         contribution = GoalContribution(
             goal_id=goal.id,
-            amount=data.amount,
+            amount=amount,
             contribution_date=date.today(),
             notes=data.notes,
         )
         await self.contributions.add(contribution)
-        goal.current_amount += data.amount
+        goal.current_amount += amount
         if goal.current_amount >= goal.target_amount:
             goal.status = "completed"
         await self.session.flush()

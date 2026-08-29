@@ -11,14 +11,14 @@
     "dev:android": "cd apps/mobile && npx expo start --android",
     "dev:backend": "cd backend && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000",
     "build:web": "cd apps/mobile && npx expo export --platform web",
-    "lint": "turbo run lint",
-    "test": "turbo run test",
+    "typecheck": "cd apps/mobile && npx tsc --noEmit",
+    "test:backend": "node scripts/py.mjs --cwd backend -m pytest -q",
+    "test:e2e": "node scripts/py.mjs scripts/e2e_smoke.py",
+    "test": "npm run typecheck && npm run test:backend",
+    "verify": "npm run typecheck && npm run test:backend && npm run test:e2e",
     "docker:up": "docker compose up -d db redis",
     "docker:down": "docker compose down",
     "docker:migrate": "docker compose run --rm migrate"
-  },
-  "devDependencies": {
-    "turbo": "^2.0.0"
   },
   "packageManager": "npm@10.0.0"
 }

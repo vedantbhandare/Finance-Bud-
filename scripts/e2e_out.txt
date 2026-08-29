@@ -1,0 +1,82 @@
+  -> GET    http://localhost:8000/api/health ... 200 PASS
+  -> POST   /auth/register ... 201 PASS
+  -> POST   /auth/login ... 200 PASS
+  -> GET    /auth/me ... 200 PASS
+  -> POST   /auth/refresh ... 200 PASS
+  -> GET    /categories ... 200 PASS
+  -> POST   /onboarding/income ... 200 PASS
+  -> POST   /onboarding/expenses ... 200 PASS
+  -> POST   /onboarding/goals ... 200 PASS
+  -> POST   /onboarding/spending-style ... 200 PASS
+  -> POST   /onboarding/complete ... 200 PASS
+  -> POST   /transactions ... 201 PASS
+  -> GET    /transactions ... 200 PASS
+  -> GET    /transactions/d99f42db-6165-43ef-83a8-ff5e7196ef5e ... 200 PASS
+  -> PATCH  /transactions/d99f42db-6165-43ef-83a8-ff5e7196ef5e ... 200 PASS
+  -> PUT    /transactions/d99f42db-6165-43ef-83a8-ff5e7196ef5e ... 200 PASS
+  -> GET    /transactions/summary/monthly ... 200 PASS
+  -> POST   /budgets/generate ... 200 PASS
+  -> GET    /budgets/current ... 200 PASS
+  -> GET    /health/score ... 200 PASS
+  -> GET    /health/history ... 200 PASS
+  -> POST   /goals ... 201 PASS
+  -> GET    /goals ... 200 PASS
+  -> GET    /goals/3fb9814f-0076-4bec-84c2-0ead655f9553 ... 200 PASS
+  -> PATCH  /goals/3fb9814f-0076-4bec-84c2-0ead655f9553 ... 200 PASS
+  -> PUT    /goals/3fb9814f-0076-4bec-84c2-0ead655f9553 ... 200 PASS
+  -> POST   /goals/3fb9814f-0076-4bec-84c2-0ead655f9553/contribute ... 200 PASS
+  -> DELETE /goals/3fb9814f-0076-4bec-84c2-0ead655f9553 ... 204 PASS
+  -> POST   /chat/message ... 200 PASS
+  -> GET    /chat/conversations ... 200 PASS
+  -> GET    /chat/conversations/4d4986b6-3f16-43d8-b79d-d5e5a6e868b3/messages ... 200 PASS
+  -> DELETE /transactions/d99f42db-6165-43ef-83a8-ff5e7196ef5e ... 204 PASS
+  -> GET    /auth/me ... 401 PASS
+  -> GET    /auth/me ... 401 PASS
+  -> POST   /auth/register ... 422 PASS
+  -> GET    /transactions/2f73d7eb-fc34-4c4b-be65-c319621c6009 ... 404 PASS
+  -> POST   /auth/register ... 409 PASS
+  -> POST   /auth/login ... 401 PASS
+
+========================================================================================
+RESULT CODE  LABEL                      ROUTE
+----------------------------------------------------------------------------------------
+PASS   200   health                     GET http://localhost:8000/api/health
+PASS   201   auth.register              POST /auth/register
+PASS   200   auth.login                 POST /auth/login
+PASS   200   auth.me                    GET /auth/me
+PASS   200   auth.refresh               POST /auth/refresh
+PASS   200   categories.list            GET /categories
+PASS   200   onboarding.income          POST /onboarding/income
+PASS   200   onboarding.expenses        POST /onboarding/expenses
+PASS   200   onboarding.goals           POST /onboarding/goals
+PASS   200   onboarding.spending_style  POST /onboarding/spending-style
+PASS   200   onboarding.complete        POST /onboarding/complete
+PASS   201   tx.create                  POST /transactions
+PASS   200   tx.list                    GET /transactions
+PASS   200   tx.get                     GET /transactions/d99f42db-6165-43ef-83a8-ff5e7196ef5e
+PASS   200   tx.patch                   PATCH /transactions/d99f42db-6165-43ef-83a8-ff5e7196ef5e
+PASS   200   tx.put                     PUT /transactions/d99f42db-6165-43ef-83a8-ff5e7196ef5e
+PASS   200   tx.summary_monthly         GET /transactions/summary/monthly
+PASS   200   budgets.generate           POST /budgets/generate
+PASS   200   budgets.current            GET /budgets/current
+PASS   200   health.score               GET /health/score
+PASS   200   health.history             GET /health/history
+PASS   201   goals.create               POST /goals
+PASS   200   goals.list                 GET /goals
+PASS   200   goals.get                  GET /goals/3fb9814f-0076-4bec-84c2-0ead655f9553
+PASS   200   goals.patch                PATCH /goals/3fb9814f-0076-4bec-84c2-0ead655f9553
+PASS   200   goals.put                  PUT /goals/3fb9814f-0076-4bec-84c2-0ead655f9553
+PASS   200   goals.contribute           POST /goals/3fb9814f-0076-4bec-84c2-0ead655f9553/contribute
+PASS   204   goals.delete               DELETE /goals/3fb9814f-0076-4bec-84c2-0ead655f9553
+PASS   200   chat.message               POST /chat/message
+PASS   200   chat.conversations         GET /chat/conversations
+PASS   200   chat.messages              GET /chat/conversations/4d4986b6-3f16-43d8-b79d-d5e5a6e868b3/messages
+PASS   204   tx.delete                  DELETE /transactions/d99f42db-6165-43ef-83a8-ff5e7196ef5e
+PASS   401   authz.me_no_token          GET /auth/me
+PASS   401   authz.bad_token            GET /auth/me
+PASS   422   validation.bad_register    POST /auth/register
+PASS   404   notfound.tx                GET /transactions/2f73d7eb-fc34-4c4b-be65-c319621c6009
+PASS   409   dup.register               POST /auth/register
+PASS   401   wrongpw.login              POST /auth/login
+========================================================================================
+TOTAL 38  |  PASSED 38  |  FAILED 0

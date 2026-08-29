@@ -48,7 +48,7 @@ This is NOT a simple expense tracker. Finance Buddy:
 | **Cache** | Redis 7 |
 | **AI** | Google Gemini API (free tier) |
 | **Auth** | Custom JWT + Argon2 |
-| **Monorepo** | Turborepo |
+| **Monorepo** | npm workspaces |
 
 ## 📁 Project Structure
 
@@ -58,7 +58,7 @@ finance-buddy/
 ├── backend/              # FastAPI server
 ├── packages/shared/      # Shared types & constants
 ├── docker-compose.yml    # PostgreSQL + Redis
-├── turbo.json           # Monorepo config
+├── scripts/              # Verification helpers (py.mjs, e2e_smoke.py)
 └── package.json         # Workspace root
 ```
 

@@ -1,11 +1,11 @@
 # Graph Report - finance buddy  (2026-08-29)
 
 ## Corpus Check
-- 125 files · ~116,680 words
+- 127 files · ~121,332 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 989 nodes · 2094 edges · 86 communities (58 shown, 28 thin omitted)
+- 988 nodes · 2108 edges · 95 communities (67 shown, 28 thin omitted)
 - Extraction: 89% EXTRACTED · 11% INFERRED · 0% AMBIGUOUS · INFERRED: 236 edges (avg confidence: 0.93)
 - Token cost: 0 input · 0 output
 
@@ -15,29 +15,29 @@
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
+- repositories.py
 - User
-- schemas.py
-- deps.py
+- routers/auth.py
 - application/health.py
 - Text.tsx
 - OnboardingService
 - exceptions.py
-- TransactionRepository
+- CategoryRepository
 - Shared Types Package
 - Backend Test Harness
-- useAuthStore
+- style.tsx
 - GoalService
 - expo
 - dependencies.py
 - scripts
-- tasks
+- deps.py
 - services/api.ts
-- get_settings
+- env.py
 - types/api.ts
 - login.tsx
 - home.tsx
 - orchestrator.py
-- goals.tsx
+- finance.ts
 - FastAPI Server
 - dependencies
 - theme.ts
@@ -49,15 +49,15 @@
 - Backend Setup Procedure
 - Upward Chevron / Ascending Peak Mark
 - expo-router
-- Finance Buddy
+- India-Specific Categories (Auto/Riksha, Kirana, EMI, Chai)
 - Finance Buddy Android Adaptive Icon Foreground
-- expenses.tsx
+- errors.py
 - shared/package.json
 - DDD Layering (core/domain/application/infrastructure/api)
 - Icon Safe Zone Construction Guides
 - Upward Chevron Brand Mark
 - Mobile App Favicon (Expo web icon)
-- env.py
+- get_settings
 - tsconfig.json
 - API Schemas as Sole HTTP Contract
 - Splash Icon Asset (concentric rings on grid)
@@ -91,6 +91,15 @@
 - app/__init__.py
 - finance-buddy-backend
 - scripts
+- schemas.py
+- ChatService
+- routers/goals.py
+- chat.tsx
+- app/database.py
+- Finance Buddy
+- e2e_smoke.py
+- current_budget
+- py.mjs
 
 ## God Nodes (most connected - your core abstractions)
 1. `User` - 51 edges
@@ -100,8 +109,8 @@
 5. `OnboardingService` - 27 edges
 6. `CategoryRepository` - 25 edges
 7. `BudgetService` - 24 edges
-8. `AuthService` - 22 edges
-9. `Theme` - 21 edges
+8. `Theme` - 22 edges
+9. `AuthService` - 22 edges
 10. `Base` - 21 edges
 
 ## Surprising Connections (you probably didn't know these)
@@ -109,12 +118,12 @@
   PROGRESS.md → README.md
 - `db service (postgres:16-alpine)` --implements--> `PostgreSQL 16`  [INFERRED]
   docker-compose.yml → README.md
-- `Uvicorn ASGI Dev Server` --implements--> `FastAPI Server`  [INFERRED]
-  SETUP.md → README.md
 - `Stateless Refresh Tokens Never Revoked` --conceptually_related_to--> `Redis 7 Cache`  [AMBIGUOUS]
   PROGRESS.md → README.md
 - `Backend Setup Procedure` --references--> `Backend Environment Variables Contract`  [INFERRED]
   SETUP.md → README.md
+- `api service (FastAPI container)` --implements--> `FastAPI Server`  [INFERRED]
+  docker-compose.yml → README.md
 
 ## Import Cycles
 - None detected.
@@ -130,39 +139,39 @@
 - **Mobile Brand Identity System (mark, palette, adaptive-icon delivery)** — apps_mobile_assets_android_icon_foreground_icon, apps_mobile_assets_android_icon_foreground_upward_chevron_mark, apps_mobile_assets_android_icon_foreground_blue_gradient_palette, apps_mobile_assets_android_icon_foreground_growth_upward_trend_metaphor [INFERRED 0.85]
 - **Icon Visual Design System (mark, grid, palette, stroke geometry)** — apps_mobile_assets_icon_upward_chevron_mark, apps_mobile_assets_icon_construction_grid, apps_mobile_assets_icon_blue_gradient_palette, apps_mobile_assets_icon_rounded_stroke_geometry [INFERRED 0.85]
 
-## Communities (86 total, 28 thin omitted)
+## Communities (95 total, 28 thin omitted)
 
-### Community 0 - "User"
-Cohesion: 0.08
-Nodes (54): AsyncSession, budget_service(), current_budget(), generate_budget(), get, post, User, conversations() (+46 more)
-
-### Community 1 - "schemas.py"
+### Community 0 - "repositories.py"
 Cohesion: 0.07
-Nodes (54): transaction_service(), create_transaction(), delete_transaction(), get_transaction(), list_transactions(), monthly_summary(), date, delete (+46 more)
+Nodes (54): AsyncSession, BudgetAllocationResponse, BudgetEnvelope, BudgetGenerateResponse, FinancialContextResponse, BudgetService, AsyncSession, User (+46 more)
 
-### Community 2 - "deps.py"
-Cohesion: 0.06
-Nodes (58): auth_service(), chat_service(), current_user(), AsyncSession, HTTPAuthorizationCredentials, User, login(), me() (+50 more)
+### Community 1 - "User"
+Cohesion: 0.24
+Nodes (19): create_transaction(), delete_transaction(), get_transaction(), list_transactions(), monthly_summary(), date, delete, get (+11 more)
+
+### Community 2 - "routers/auth.py"
+Cohesion: 0.17
+Nodes (18): login(), me(), get, post, User, refresh(), register(), LoginRequest (+10 more)
 
 ### Community 3 - "application/health.py"
-Cohesion: 0.07
-Nodes (39): health_service(), history(), get, User, score(), HealthScoreResponse, AsyncSession, User (+31 more)
+Cohesion: 0.13
+Nodes (27): BudgetInput, BudgetLine, generate_budget(), monthly_goal_contribution(), date, Decimal, Compute the monthly contribution needed to hit a goal by its target date. If no…, categorize_text() (+19 more)
 
 ### Community 4 - "Text.tsx"
-Cohesion: 0.11
-Nodes (17): styles, { width }, styles, styles, styles, HURDLES, styles, Button() (+9 more)
+Cohesion: 0.16
+Nodes (12): styles, { width }, styles, styles, ButtonProps, styles, HealthRing(), HealthRingProps (+4 more)
 
 ### Community 5 - "OnboardingService"
-Cohesion: 0.24
-Nodes (16): onboarding_service(), complete(), expenses(), goals(), income(), post, User, spending_style() (+8 more)
+Cohesion: 0.29
+Nodes (14): complete(), expenses(), goals(), income(), post, User, spending_style(), ExpenseSetup (+6 more)
 
 ### Community 6 - "exceptions.py"
 Cohesion: 0.10
 Nodes (23): app_error_handler(), AppError, AuthenticationError, AuthorizationError, ConflictError, ExternalServiceError, NotFoundError, Any (+15 more)
 
-### Community 7 - "TransactionRepository"
-Cohesion: 0.10
-Nodes (11): AsyncSession, AsyncSession, date, Transaction, Single SQL query for income, expenses, and net., SQL GROUP BY for expense breakdown per category., SQL GROUP BY for daily expense totals., Repository (+3 more)
+### Community 7 - "CategoryRepository"
+Cohesion: 0.07
+Nodes (18): list_categories(), AsyncSession, get, User, AsyncSession, AsyncSession, CategoryRepository, AsyncSession (+10 more)
 
 ### Community 8 - "Shared Types Package"
 Cohesion: 0.07
@@ -172,13 +181,13 @@ Nodes (27): AI_PERSONALITIES, AIPersonality, CURRENCY_SYMBOL, DEFAULT_CATEGORIES
 Cohesion: 0.13
 Nodes (23): auth_headers(), client(), engine(), event_loop_policy(), AsyncClient, register_user(), session_factory(), AsyncClient (+15 more)
 
-### Community 10 - "useAuthStore"
-Cohesion: 0.14
-Nodes (14): plugins, Index(), styles, queryClient, RootLayoutNav(), ProfileScreen(), AuthState, useAuthStore (+6 more)
+### Community 10 - "style.tsx"
+Cohesion: 0.11
+Nodes (18): plugins, Index(), styles, queryClient, RootLayoutNav(), ProfileScreen(), HURDLE_CATEGORIES, HURDLES (+10 more)
 
 ### Community 11 - "GoalService"
-Cohesion: 0.11
-Nodes (30): goal_service(), contribute(), create_goal(), delete_goal(), get_goal(), list_goals(), delete, get (+22 more)
+Cohesion: 0.16
+Nodes (17): contribute(), delete_goal(), get_goal(), list_goals(), delete, get, post, User (+9 more)
 
 ### Community 12 - "expo"
 Cohesion: 0.09
@@ -190,43 +199,43 @@ Nodes (22): get_ai_orchestrator(), get_auth_service(), get_budget_service(), get
 
 ### Community 14 - "scripts"
 Cohesion: 0.10
-Nodes (20): devDependencies, turbo, turbo, name, packageManager, private, scripts, build:web (+12 more)
+Nodes (20): name, packageManager, private, scripts, build:web, dev:android, dev:backend, dev:web (+12 more)
 
-### Community 15 - "tasks"
-Cohesion: 0.11
-Nodes (19): ^build, dist/**, **/.env.*local, ^lint, .next/**, !.next/cache/**, dependsOn, outputs (+11 more)
+### Community 15 - "deps.py"
+Cohesion: 0.13
+Nodes (23): auth_service(), budget_service(), chat_service(), current_user(), goal_service(), health_service(), onboarding_service(), AsyncSession (+15 more)
 
 ### Community 16 - "services/api.ts"
-Cohesion: 0.19
-Nodes (8): config, api, AuthResponse, LoginPayload, RegisterPayload, Goal, GoalCreate, goalService
+Cohesion: 0.17
+Nodes (9): config, api, AuthResponse, authService, LoginPayload, RegisterPayload, Goal, GoalCreate (+1 more)
 
-### Community 17 - "get_settings"
+### Community 17 - "env.py"
 Cohesion: 0.13
-Nodes (14): get_settings(), BaseSettings, field_validator, Application configuration loaded from environment variables. Validates critical…, Centralised application settings backed by .env / env vars., Log a loud warning if the JWT secret is a known insecure default. In production…, Return a cached Settings instance (loaded once per process)., Settings (+6 more)
+Nodes (16): do_run_migrations(), Alembic environment configuration for async migrations., Run migrations in 'offline' mode., Run migrations in 'online' mode with async engine., Run migrations in 'online' mode., run_async_migrations(), run_migrations_offline(), run_migrations_online() (+8 more)
 
 ### Community 18 - "types/api.ts"
 Cohesion: 0.11
 Nodes (16): ApiError, ApiResponse, AuthTokens, Budget, ChatMessage, DashboardData, FinancialGoal, LoginResponse (+8 more)
 
 ### Community 19 - "login.tsx"
-Cohesion: 0.21
-Nodes (10): LoginForm, loginSchema, LoginScreen(), styles, RegisterForm, registerSchema, RegisterScreen(), styles (+2 more)
+Cohesion: 0.18
+Nodes (12): LoginForm, loginSchema, LoginScreen(), styles, RegisterForm, registerSchema, RegisterScreen(), styles (+4 more)
 
 ### Community 20 - "home.tsx"
-Cohesion: 0.13
-Nodes (17): styles, formatCurrency(), HomeScreen(), styles, styles, BudgetPlan, budgetService, ChatMessage (+9 more)
+Cohesion: 0.18
+Nodes (14): BudgetsScreen(), formatCurrency(), styles, formatCurrency(), HomeScreen(), styles, BudgetPlan, HealthScore (+6 more)
 
 ### Community 21 - "orchestrator.py"
 Cohesion: 0.21
 Nodes (13): assemble_context(), FinancialContext, format_context_for_prompt(), AsyncSession, UUID, Context assembler — builds a COMPLETE financial snapshot for AI prompts. This…, Format financial context as human-readable text for prompt injection., Pre-computed financial snapshot injected into AI prompts. Every field is… (+5 more)
 
-### Community 22 - "goals.tsx"
-Cohesion: 0.22
-Nodes (7): styles, Goal, GOAL_TEMPLATES, styles, Card(), CardProps, styles
+### Community 22 - "finance.ts"
+Cohesion: 0.10
+Nodes (18): styles, COMMON_EXPENSES, Expense, styles, styles, Goal, GOAL_TEMPLATES, styles (+10 more)
 
 ### Community 23 - "FastAPI Server"
-Cohesion: 0.19
-Nodes (14): api service (FastAPI container), db service (postgres:16-alpine), Hardcoded Dev JWT Secret, Service Healthchecks, migrate service (tools profile), pgdata Persistent Volume, redis service (redis:7-alpine), Healthy-Dependency Startup Ordering (+6 more)
+Cohesion: 0.18
+Nodes (14): api service (FastAPI container), db service (postgres:16-alpine), Service Healthchecks, migrate service (tools profile), pgdata Persistent Volume, redis service (redis:7-alpine), Healthy-Dependency Startup Ordering, Stateless Refresh Tokens Never Revoked (+6 more)
 
 ### Community 24 - "dependencies"
 Cohesion: 0.15
@@ -257,8 +266,8 @@ Cohesion: 0.29
 Nodes (8): Budget Pacing Context for AI Chat, Date-Aware Goal Allocation, Domain Layer (pure types, enums, deterministic rules), Goal Contribution Overshoot Cap, Financial Rules Engine (Deterministic, Testable, Auditable), Google Gemini API, Core Principle: Trust (LLMs never compute balances), Optional Gemini Key with Feature Fallback
 
 ### Community 31 - "Backend Setup Procedure"
-Cohesion: 0.22
-Nodes (10): No Silent Catch on User Actions, React Query Owns Server State, Zustand Owns Session, Backend Environment Variables Contract, Expo Clients (Web + Android), OpenAPI Docs Endpoint, Backend Setup Procedure, Expo Android Dev Target, Expo Web Dev Target (+2 more)
+Cohesion: 0.29
+Nodes (8): No Silent Catch on User Actions, React Query Owns Server State, Zustand Owns Session, Backend Environment Variables Contract, Expo Clients (Web + Android), Backend Setup Procedure, Expo Android Dev Target, Expo Web Dev Target, uv Python Package Manager
 
 ### Community 32 - "Upward Chevron / Ascending Peak Mark"
 Cohesion: 0.43
@@ -268,17 +277,17 @@ Nodes (7): Finance Buddy Mobile App Icon, Blue Gradient Brand Palette, Circular 
 Cohesion: 0.17
 Nodes (4): styles, TAB_ICONS, TAB_LABELS, expo-router
 
-### Community 34 - "Finance Buddy"
-Cohesion: 0.18
-Nodes (11): Deterministic Category Seeding at Startup, Four-Step Onboarding Flow, Word-Boundary Transaction Categorization, Adaptive Budget Generation, AI-Native Personal Finance Operating System, Finance Buddy, India-Specific Categories (Auto/Riksha, Kirana, EMI, Chai), India-First Product Design (+3 more)
+### Community 34 - "India-Specific Categories (Auto/Riksha, Kirana, EMI, Chai)"
+Cohesion: 0.29
+Nodes (7): Deterministic Category Seeding at Startup, Four-Step Onboarding Flow, Word-Boundary Transaction Categorization, Adaptive Budget Generation, India-Specific Categories (Auto/Riksha, Kirana, EMI, Chai), India-First Product Design, Salary Cycle Awareness
 
 ### Community 35 - "Finance Buddy Android Adaptive Icon Foreground"
 Cohesion: 0.53
 Nodes (6): Android Adaptive Icon Foreground/Background Layering, Blue Vertical Gradient Brand Palette, Upward Trend / Financial Growth Metaphor, Finance Buddy Android Adaptive Icon Foreground, Adaptive Icon Safe-Zone Padding, Upward Chevron Brand Mark
 
-### Community 36 - "expenses.tsx"
-Cohesion: 0.20
-Nodes (7): COMMON_EXPENSES, Expense, styles, styles, Input(), InputProps, styles
+### Community 36 - "errors.py"
+Cohesion: 0.12
+Nodes (19): Transaction, TransactionResponse, transaction_response(), date, TransactionCreate, TransactionResponse, app_error_handler(), AppError (+11 more)
 
 ### Community 37 - "shared/package.json"
 Cohesion: 0.33
@@ -300,9 +309,9 @@ Nodes (5): Upward Chevron Brand Mark, Android Monochrome App Icon (Finance Buddy
 Cohesion: 0.60
 Nodes (5): Blue-on-Pale-Tint Icon Palette, Browser Tab / PWA Identity Asset Role, Unbranded Expo Scaffold Default Artwork, Mobile App Favicon (Expo web icon), Upward Chevron Brand Mark
 
-### Community 42 - "env.py"
-Cohesion: 0.28
-Nodes (8): do_run_migrations(), Alembic environment configuration for async migrations., Run migrations in 'offline' mode., Run migrations in 'online' mode with async engine., Run migrations in 'online' mode., run_async_migrations(), run_migrations_offline(), run_migrations_online()
+### Community 42 - "get_settings"
+Cohesion: 0.17
+Nodes (13): User, get_settings(), BaseSettings, field_validator, Settings, create_access_token(), create_refresh_token(), _create_token() (+5 more)
 
 ### Community 43 - "tsconfig.json"
 Cohesion: 0.40
@@ -324,6 +333,42 @@ Nodes (3): Financial Health Score, Tiered Recommendations Engine, Month-Over-Mon
 Cohesion: 0.40
 Nodes (5): scripts, android, ios, start, web
 
+### Community 86 - "schemas.py"
+Cohesion: 0.18
+Nodes (17): BudgetPlanResponse, category_to_response(), CategoryResponse, CategorySummary, ChatMetadata, DailySpend, ErrorResponse, ExpenseItem (+9 more)
+
+### Community 87 - "ChatService"
+Cohesion: 0.27
+Nodes (11): conversations(), messages(), get, post, User, send(), ChatRequest, ChatResponse (+3 more)
+
+### Community 88 - "routers/goals.py"
+Cohesion: 0.31
+Nodes (8): create_goal(), GoalCreate, patch, put, replace_goal(), update_goal(), GoalCreate, GoalUpdate
+
+### Community 89 - "chat.tsx"
+Cohesion: 0.29
+Nodes (7): ChatScreen(), INITIAL_MESSAGES, Message, renderWithAmounts(), styles, SUGGESTIONS, chatService
+
+### Community 90 - "app/database.py"
+Cohesion: 0.29
+Nodes (6): create_tables(), get_db_session(), AsyncSession, Async SQLAlchemy engine, session factory, and FastAPI dependency. Supports…, FastAPI dependency — yields an async session with auto commit/rollback., Create all tables (SQLite dev mode — Alembic handles production).
+
+### Community 91 - "Finance Buddy"
+Cohesion: 0.33
+Nodes (6): Hardcoded Dev JWT Secret, AI-Native Personal Finance Operating System, Finance Buddy, Custom JWT + Argon2 Auth, Psychological Spending Coaching, Turborepo Monorepo
+
+### Community 92 - "e2e_smoke.py"
+Cohesion: 0.47
+Nodes (5): call(), main(), End-to-end smoke test: exercises every API route against a live server. Run…, Hit a route, record pass/fail, return the parsed body (or None)., report()
+
+### Community 93 - "current_budget"
+Cohesion: 0.40
+Nodes (5): current_budget(), generate_budget(), get, post, User
+
+### Community 94 - "py.mjs"
+Cohesion: 0.40
+Nodes (4): args, cwdIndex, repoRoot, result
+
 ## Ambiguous Edges - Review These
 - `Redis 7 Cache` → `Stateless Refresh Tokens Never Revoked`  [AMBIGUOUS]
   PROGRESS.md · relation: conceptually_related_to
@@ -335,7 +380,7 @@ Nodes (5): scripts, android, ios, start, web
   apps/mobile/assets/favicon.png · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **212 isolated node(s):** `styles`, `name`, `slug`, `version`, `orientation` (+207 more)
+- **215 isolated node(s):** `styles`, `name`, `slug`, `version`, `orientation` (+210 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **28 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -350,9 +395,9 @@ _Questions this graph is uniquely positioned to answer:_
   _Edge tagged AMBIGUOUS (relation: rationale_for) - confidence is low._
 - **What is the exact relationship between `Upward Chevron Brand Mark` and `Unbranded Expo Scaffold Default Artwork`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **Why does `User` connect `User` to `schemas.py`, `deps.py`, `application/health.py`, `OnboardingService`, `GoalService`?**
+- **Why does `User` connect `User` to `repositories.py`, `routers/auth.py`, `OnboardingService`, `CategoryRepository`, `GoalService`, `deps.py`, `ChatService`, `routers/goals.py`, `current_budget`?**
   _High betweenness centrality (0.030) - this node is a cross-community bridge._
-- **Why does `TransactionService` connect `schemas.py` to `User`, `deps.py`, `application/health.py`, `TransactionRepository`, `GoalService`, `dependencies.py`, `orchestrator.py`?**
+- **Why does `TransactionService` connect `User` to `repositories.py`, `application/health.py`, `errors.py`, `CategoryRepository`, `dependencies.py`, `deps.py`, `orchestrator.py`, `schemas.py`, `ChatService`?**
   _High betweenness centrality (0.026) - this node is a cross-community bridge._
-- **Why does `CategoryRepository` connect `deps.py` to `User`, `schemas.py`, `application/health.py`, `OnboardingService`, `TransactionRepository`, `Backend Test Harness`?**
-  _High betweenness centrality (0.020) - this node is a cross-community bridge._
+- **Why does `CategoryRepository` connect `CategoryRepository` to `repositories.py`, `User`, `routers/auth.py`, `OnboardingService`, `Backend Test Harness`, `deps.py`?**
+  _High betweenness centrality (0.021) - this node is a cross-community bridge._

@@ -16,6 +16,6 @@ async def score(user: User = Depends(current_user), service: HealthService = Dep
 
 
 @router.get("/history")
-async def history():
+async def history(user: User = Depends(current_user)):
     return {"snapshots": []}
 
